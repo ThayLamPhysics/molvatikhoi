@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lớp học Hóa diệu kỳ của Thầy Lâm</title>
+    
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tải Font Be Vietnam Pro từ Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS tùy chỉnh cho các hiệu ứng và màu sắc -->
+    <style>
+        /* Sử dụng font Be Vietnam Pro làm font chính */
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #f0f4f8; /* Màu nền xám nhạt */
+        }
+
+        /* Định nghĩa biến màu sắc để dễ quản lý */
+        :root {
+            --mau-nen-chinh: #ffffff;
+            --mau-chu-chinh: #1e293b; /* Slate 800 */
+            --mau-xanh-dam: #0d9488; /* Teal 600 */
+            --mau-xanh-nhat: #ccfbf1; /* Teal 100 */
+            --mau-vang: #facc15; /* Yellow 400 */
+            --mau-vang-dam: #eab308; /* Yellow 500 */
+        }
+
+        /* Giao diện các tab */
+        .tab-button {
+            transition: all 0.3s ease-in-out;
+            border-bottom: 4px solid transparent;
+        }
+        .tab-button.active {
+            color: var(--mau-xanh-dam);
+            border-bottom-color: var(--mau-xanh-dam);
+            font-weight: 700;
+        }
+        .tab-button:hover {
+            background-color: var(--mau-xanh-nhat);
+        }
+
+        /* Giao diện nội dung tab và hiệu ứng chuyển đổi */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Giao diện phần "Góc tương tác" với AI */
+        .goc-tuong-tac {
+            background: linear-gradient(135deg, var(--mau-xanh-nhat), #e0f2fe); /* Teal 100 to Sky 100 */
+            border-left: 5px solid var(--mau-xanh-dam);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Giao diện bài kiểm tra */
+        .quiz-option { transition: all 0.2s ease; border: 2px solid #e5e7eb; }
+        .quiz-option:hover { border-color: var(--mau-vang); transform: translateY(-2px); }
+        .quiz-option.selected { border-color: var(--mau-xanh-dam); background-color: var(--mau-xanh-nhat); }
+        .quiz-option.correct { border-color: #10b981; background-color: #d1fae5; }
+        .quiz-option.incorrect { border-color: #f43f5e; background-color: #ffe4e6; }
+        
+        /* Hiệu ứng "đánh dấu" cho các giá trị quan trọng */
+        .hieu-ung-gia-tri { display: inline-block; background-color: #fef9c3; color: #713f12; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 0.375rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); transform: rotate(-2deg); transition: all 0.2s ease-in-out; cursor: pointer; }
+        .hieu-ung-gia-tri:hover { transform: rotate(0deg) scale(1.10); }
+
+        /* Hiệu ứng "ghi chú" cho các công thức */
+        .hieu-ung-cong-thuc { display: inline-block; padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-family: monospace; font-size: 1.5rem; font-weight: bold; color: #1e293b; background-color: #fefce8; border: 2px dashed #facc15; transform: rotate(-1deg); transition: all 0.2s ease-in-out; box-shadow: 2px 2px 8px rgba(0,0,0,0.1); }
+        .hieu-ung-cong-thuc:hover { transform: rotate(1deg) scale(1.05); box-shadow: 4px 4px 12px rgba(0,0,0,0.15); }
+
+         /* CSS cho bình khí minh họa */
+        .gas-flask {
+            width: 120px;
+            height: 180px;
+            border: 5px solid #9ca3af;
+            border-bottom-left-radius: 60px;
+            border-bottom-right-radius: 60px;
+            position: relative;
+        }
+        .gas-flask::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 20px;
+            border: 5px solid #9ca3af;
+            border-bottom: none;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+         .gas-flask::after {
+            content: '';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 10px;
+            background-color: #ef4444;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <!-- TIÊU ĐỀ BÀI GIẢNG -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-yellow-400 mb-2">Lớp học Hóa diệu kỳ</h1>
+            <p class="text-lg text-slate-600">Cùng Thầy Lâm biến những khái niệm khô khan thành câu chuyện dễ nhớ!</p>
+        </header>
+
+        <!-- THANH CHỌN TAB -->
+        <div class="bg-white rounded-xl shadow-md mb-8 sticky top-2 z-50">
+            <nav class="flex flex-wrap justify-center p-2" id="tab-buttons">
+                <button data-tab="1" class="tab-button text-sm md:text-base py-3 px-4 md:px-6 rounded-t-lg active">1. Mol & Tỉ khối</button>
+                <button data-tab="2" class="tab-button text-sm md:text-base py-3 px-4 md:px-6 rounded-t-lg">2. Dung dịch & Nồng độ</button>
+                <button data-tab="3" class="tab-button text-sm md:text-base py-3 px-4 md:px-6 rounded-t-lg">3. Bài tập vận dụng</button>
+                <button data-tab="4" class="tab-button text-sm md:text-base py-3 px-4 md:px-6 rounded-t-lg">4. Hóa học quanh ta</button>
+                <button data-tab="5" class="tab-button text-sm md:text-base py-3 px-4 md:px-6 rounded-t-lg text-yellow-500 font-bold">5. Thử tài của bạn</button>
+            </nav>
+        </div>
+
+        <!-- NỘI DUNG CÁC TAB -->
+        <main id="tab-contents">
+            <!-- TAB 1: MOL VÀ TỈ KHỐI CHẤT KHÍ (KHÔI PHỤC) -->
+            <div id="tab-content-1" class="tab-content active bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                <h2 class="text-3xl font-bold text-teal-600 mb-6">Chủ đề 1: Mol - "Cái rổ" của nhà Hóa học</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <p class="mb-4 text-lg leading-relaxed">
+                            Chào các em, các em có bao giờ thắc mắc làm sao các nhà khoa học "đếm" được những hạt vô cùng nhỏ bé như nguyên tử, phân tử không? Chẳng lẽ họ lại ngồi đếm từng hạt một ư? <br><br>Không đâu! Họ dùng một "cái rổ" đặc biệt, một đơn vị đo lường cực lớn tên là <strong class="font-semibold text-teal-700">Mol</strong>.
+                        </p>
+                        <p class="mb-4 text-lg leading-relaxed">
+                            Hãy tưởng tượng nhé, nếu thầy nói "một tá trứng", các em sẽ nghĩ ngay đến 12 quả. Tương tự, khi nhà hóa học nói <strong class="font-semibold text-teal-700">"một mol"</strong>, họ đang nói đến <span class="hieu-ung-gia-tri">6,022 x 10<sup>23</sup> hạt</span> (nguyên tử, phân tử...). Con số khổng lồ này được gọi là số Avogadro.
+                        </p>
+                        <div class="mt-8 p-4 bg-teal-50 border-l-4 border-teal-500 rounded-r-lg">
+                           <h4 class="text-xl font-bold text-teal-700 mb-3">Thầy Lâm giải thích sâu hơn: Từ đâu có số Mol?</h4>
+                           <p class="mb-3 text-slate-700 leading-relaxed">
+                               Để kết nối thế giới vi mô của nguyên tử với thế giới vĩ mô, các nhà khoa học đã có một quy ước rất thông minh. Họ lấy 1/12 khối lượng của nguyên tử carbon-12 làm đơn vị khối lượng nguyên tử (amu).
+                           </p>
+                           <p class="text-slate-700 leading-relaxed">
+                                Vấn đề là, một nguyên tử thì quá nhẹ để cân. Nhưng chúng ta lại dễ dàng cân được 12 gam carbon. Và các nhà khoa học đã tìm ra rằng, trong 12 gam carbon đó có chứa chính xác <strong class="font-bold">6,022 x 10<sup>23</sup></strong> nguyên tử carbon.
+                           </p>
+                           <p class="mt-3 font-semibold text-teal-800">
+                               Con số kỳ diệu đó được đặt tên là số Avogadro (kí hiệu là N), và lượng chất chứa N hạt được gọi là 1 mol. Đó chính là cầu nối giữa "gam" và "amu" đấy các em ạ!
+                           </p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center justify-center bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-bold mb-2">Mô phỏng: Đếm hạt bằng Mol</h4>
+                        <svg id="mol-svg" class="w-full h-64 rounded-lg" viewBox="0 0 400 200"></svg>
+                        <p class="text-sm text-center text-slate-500 mt-2">Các hạt nguyên tử đang được "gom" vào một "rổ" Mol.</p>
+                    </div>
+                </div>
+                <div class="mt-12">
+                    <h3 class="text-2xl font-bold text-teal-600 mb-4">Vậy, một Mol "nặng" bao nhiêu? - Khối lượng Mol</h3>
+                    <p class="mb-4 text-lg leading-relaxed">
+                        Nếu mol là "cái rổ" để đong đếm số hạt, thì <strong class="font-semibold text-teal-700">khối lượng mol (kí hiệu là M)</strong> chính là cân nặng của cái rổ đầy ắp đó, nhưng được tính bằng đơn vị <strong class="font-semibold">gam</strong>.
+                    </p>
+                    <div class="my-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg">
+                        <p class="text-yellow-800 font-semibold">
+                            <span class="font-bold">Một điều kỳ diệu:</span> Khối lượng mol (g/mol) có <span class="font-bold text-yellow-900">cùng trị số</span> với khối lượng nguyên tử/phân tử (amu), chỉ khác nhau về đơn vị đo thôi!
+                        </p>
+                    </div>
+                    <div class="mt-8 p-6 bg-slate-50 rounded-lg text-center shadow-inner border border-slate-200">
+                        <p class="text-lg mb-4 text-slate-700">Công thức "thần thánh" để các em ghi nhớ:</p>
+                        <p class="hieu-ung-cong-thuc">M = m / n</p>
+                        <p class="mt-4 text-slate-600 text-sm">(Trong đó: M là khối lượng mol (g/mol), m là khối lượng chất (g), và n là số mol (mol))</p>
+                    </div>
+                </div>
+                <div class="mt-12">
+                     <h3 class="text-2xl font-bold text-teal-600 mb-4">Thể tích mol - "Căn phòng" dành cho các chất khí</h3>
+                     <p class="mb-4 text-lg leading-relaxed">
+                         Ta đã biết "đếm" và "cân" các hạt rồi, giờ hãy xem chúng chiếm một không gian lớn thế nào nhé! Đó là <strong class="font-semibold text-teal-700">Thể tích mol của chất khí</strong>.
+                     </p>
+                     <div class="grid md:grid-cols-3 items-center gap-6 p-6 bg-gray-50 rounded-lg">
+                         <div class="md:col-span-2">
+                             <p class="text-lg leading-relaxed text-slate-800">
+                                 Nhà khoa học Avogadro còn phát hiện ra: <strong class="font-semibold text-teal-700">ở cùng điều kiện nhiệt độ và áp suất, một mol của BẤT KỲ chất khí nào cũng chiếm một thể tích BẰNG NHAU.</strong> <br><br> Cứ tưởng tượng 1 mol khí giống như 1 người, thì dù người đó là "anh chàng" Nitrogen "gầy gò" hay "chú béo" CO₂, họ đều được cấp một "căn phòng" có diện tích y hệt nhau!
+                             </p>
+                         </div>
+                         <div class="flex justify-center gap-4">
+                             <div class="text-center">
+                                 <div class="gas-flask" style="background-color: rgba(200, 100, 50, 0.4);"></div>
+                                 <p class="mt-2 font-bold text-sm">Bình khí NO₂</p>
+                             </div>
+                              <div class="text-center">
+                                 <div class="gas-flask" style="background-color: rgba(240, 255, 120, 0.5);"></div>
+                                 <p class="mt-2 font-bold text-sm">Bình khí Cl₂</p>
+                             </div>
+                         </div>
+                     </div>
+                    <div class="mt-8 p-6 bg-slate-50 rounded-lg text-center shadow-inner border border-slate-200">
+                        <p class="text-lg mb-4 text-slate-700">Ở điều kiện chuẩn (25°C, 1 bar), "căn phòng" này có thể tích là <span class="hieu-ung-gia-tri">24,79 lít</span></p>
+                        <p class="text-lg mt-6 mb-4 text-slate-700">Vậy công thức tính thể tích (V) của n mol khí ở điều kiện chuẩn là:</p>
+                        <p class="hieu-ung-cong-thuc">V = 24,79 ⋅ n</p>
+                    </div>
+                </div>
+                <div class="mt-12">
+                    <h3 class="text-2xl font-bold text-teal-600 mb-4">Cuối cùng, Tỉ khối chất khí là gì?</h3>
+                    <p class="mb-4 text-lg leading-relaxed">
+                        Đây là một câu chuyện so sánh. Sau khi biết khối lượng mol, ta có thể dễ dàng so sánh xem khí này "nặng" hay "nhẹ" hơn khí kia bao nhiêu lần. Đó chính là <strong class="font-semibold text-teal-700">tỉ khối</strong>.
+                    </p>
+                     <div class="mt-10 grid md:grid-cols-2 gap-8">
+                        <div class="p-6 bg-slate-50 rounded-lg text-center shadow-inner border border-slate-200">
+                            <h4 class="font-bold text-lg text-slate-800 mb-4">1. So với khí khác</h4>
+                            <p class="text-slate-700 mb-4">So sánh khí A với khí B:</p>
+                            <p class="hieu-ung-cong-thuc">d<sub>A/B</sub> = M<sub>A</sub> / M<sub>B</sub></p>
+                        </div>
+                        <div class="p-6 bg-slate-50 rounded-lg text-center shadow-inner border border-slate-200">
+                            <h4 class="font-bold text-lg text-slate-800 mb-4">2. So với không khí</h4>
+                            <p class="text-slate-700 mb-4">So sánh khí A với không khí (<span class="hieu-ung-gia-tri">M ≈ 29</span>):</p>
+                            <p class="hieu-ung-cong-thuc">d<sub>A/kk</sub> = M<sub>A</sub> / 29</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
+                        <strong>Ghi nhớ của Thầy Lâm:</strong> Nếu tỉ khối so với không khí > 1 thì khí đó nặng hơn không khí (sẽ chìm xuống), nếu < 1 thì nhẹ hơn không khí (sẽ bay lên).
+                    </div>
+                </div>
+                <div class="goc-tuong-tac mt-12 p-6 rounded-xl">
+                    <h3 class="font-bold text-xl text-teal-700 mb-4">Góc tương tác của Thầy Lâm</h3>
+                    <p class="mb-4 text-slate-700">Có thắc mắc gì về Mol, Khối lượng mol, Thể tích mol hay Tỉ khối không? Đừng ngần ngại hỏi thầy nhé!</p>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input type="text" id="ai-input-1" class="flex-grow p-3 border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition" placeholder="Ví dụ: Khí CO₂ nặng hay nhẹ hơn không khí?">
+                        <button onclick="askAI(1)" class="bg-yellow-400 text-white font-bold py-3 px-6 rounded-lg hover:bg-yellow-500 transition-transform transform hover:scale-105 shadow-md">Gửi câu hỏi</button>
+                    </div>
+                    <div id="ai-response-1" class="mt-4 p-4 bg-white rounded-lg min-h-[50px] text-slate-700 leading-relaxed whitespace-pre-wrap"></div>
+                </div>
+            </div>
+
+            <!-- TAB 2: DUNG DỊCH VÀ NỒNG ĐỘ (KHÔI PHỤC) -->
+            <div id="tab-content-2" class="tab-content bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                <h2 class="text-3xl font-bold text-teal-600 mb-6">Chủ đề 2: Pha một ly "dung dịch" cuộc sống</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <p class="mb-4 text-lg leading-relaxed">
+                            Các em có thích uống nước chanh không? Khi em vắt chanh (<strong class="text-yellow-600">chất tan</strong>) vào một cốc nước (<strong class="text-blue-600">dung môi</strong>), em đã tạo ra một <strong class="text-teal-700 font-semibold">dung dịch</strong> nước chanh rồi đấy! Đơn giản phải không nào?
+                        </p>
+                        <p class="mb-4 text-lg leading-relaxed">
+                            Dung dịch chính là một hỗn hợp đồng nhất, nghĩa là chất tan đã hòa quyện hoàn toàn vào dung môi. Chất tan có thể là rắn (đường), lỏng (cồn) hoặc khí (CO₂ trong nước ngọt).
+                        </p>
+                        <div class="mt-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg">
+                           <h4 class="text-xl font-bold text-blue-700 mb-3">Thầy Lâm đố nhé: Khi nào thì dung dịch "no"?</h4>
+                           <p class="mb-3 text-slate-700 leading-relaxed">
+                               Cứ tưởng tượng em đang pha nước đường. Em cho một thìa, khuấy lên, đường tan hết. Em cho thêm thìa nữa, vẫn tan. Đó gọi là dung dịch <strong class="font-semibold">chưa bão hoà</strong> - nó vẫn còn "đói" và có thể hòa tan thêm đường.
+                           </p>
+                           <p class="text-slate-700 leading-relaxed">
+                               Nhưng đến một lúc nào đó, em cho thêm đường vào mà nó không tài nào tan được nữa, cứ nằm ì dưới đáy cốc. Lúc này, dung dịch đã "no căng bụng" rồi, ta gọi đó là dung dịch <strong class="font-semibold">bão hoà</strong>.
+                           </p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center justify-center bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-bold mb-2">Mô phỏng: Thêm chất tan</h4>
+                        <svg id="concentration-svg" class="w-full h-64 rounded-lg" viewBox="0 0 400 250"></svg>
+                        <button id="add-solute-btn" class="mt-4 bg-teal-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-600 transition-transform transform hover:scale-105">Thêm chất tan</button>
+                    </div>
+                </div>
+                <div class="mt-12">
+                     <h3 class="text-2xl font-bold text-teal-600 mb-4">Độ tan (S) - "Sức ăn" của dung môi</h3>
+                     <p class="mb-4 text-lg leading-relaxed">
+                         Mỗi chất tan khác nhau lại có một "sức ăn" khác nhau trong cùng một dung môi. Có chất tan rất tốt (cần rất nhiều mới no), có chất lại tan rất kém (chỉ cần một ít là no ngay). Để đặc trưng cho khả năng này, người ta dùng khái niệm <strong class="font-semibold text-teal-700">Độ tan</strong>.
+                     </p>
+                     <p class="mb-6 text-lg leading-relaxed">
+                         Độ tan của một chất trong nước được định nghĩa là <strong class="font-semibold">số gam chất đó</strong> hòa tan được trong <strong class="font-semibold">100 gam nước</strong> để tạo thành dung dịch bão hòa ở một nhiệt độ xác định.
+                     </p>
+                     <div class="mt-8 p-6 bg-slate-50 rounded-lg text-center shadow-inner border border-slate-200">
+                        <p class="text-lg mb-4 text-slate-700">Công thức tính "sức ăn" đây các em nhé:</p>
+                        <p class="hieu-ung-cong-thuc">S = (m<sub>ct</sub> / m<sub>H₂O</sub>) x 100</p>
+                        <p class="mt-4 text-sm text-slate-600">
+                           <strong>Lưu ý:</strong> Độ tan của hầu hết các chất rắn (như đường, muối) sẽ tăng lên khi ta đun nóng dung dịch đấy!
+                        </p>
+                    </div>
+                </div>
+                <h3 class="text-2xl font-bold text-teal-600 mt-12 mb-4">"Độ đậm nhạt" chính là Nồng độ!</h3>
+                <p class="mb-8 text-lg leading-relaxed text-center max-w-3xl mx-auto">
+                   Độ tan cho biết khả năng hòa tan tối đa, còn Nồng độ cho ta biết độ "đậm đặc" thực tế của một dung dịch bất kỳ (dù nó bão hòa hay chưa).
+                </p>
+                <div class="mt-8 grid md:grid-cols-2 gap-8">
+                    <div class="p-6 bg-slate-50 rounded-lg shadow-inner border border-slate-200">
+                        <h4 class="text-xl font-bold text-slate-800 mb-4 text-center">1. Nồng độ phần trăm (C%)</h4>
+                        <p class="text-slate-700 mb-4 text-center">Cho biết số gam chất tan có trong 100g dung dịch.</p>
+                        <div class="text-center mt-6">
+                            <p class="hieu-ung-cong-thuc">C% = (m<sub>ct</sub> / m<sub>dd</sub>) x 100%</p>
+                        </div>
+                    </div>
+                     <div class="p-6 bg-slate-50 rounded-lg shadow-inner border border-slate-200">
+                        <h4 class="text-xl font-bold text-slate-800 mb-4 text-center">2. Nồng độ mol (C<sub>M</sub>)</h4>
+                        <p class="text-slate-700 mb-4 text-center">Cho biết số mol chất tan có trong 1 lít dung dịch.</p>
+                        <div class="text-center mt-6">
+                            <p class="hieu-ung-cong-thuc">C<sub>M</sub> = n / V</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="goc-tuong-tac mt-12 p-6 rounded-xl">
+                    <h3 class="font-bold text-xl text-teal-700 mb-4">Góc tương tác của Thầy Lâm</h3>
+                    <p class="mb-4 text-slate-700">Có thắc mắc về Độ tan, Nồng độ C% hay C<sub>M</sub> không? Hỏi thầy ngay nhé!</p>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input type="text" id="ai-input-2" class="flex-grow p-3 border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition" placeholder="Ví dụ: Độ tan và nồng độ khác nhau thế nào ạ?">
+                        <button onclick="askAI(2)" class="bg-yellow-400 text-white font-bold py-3 px-6 rounded-lg hover:bg-yellow-500 transition-transform transform hover:scale-105 shadow-md">Gửi câu hỏi</button>
+                    </div>
+                    <div id="ai-response-2" class="mt-4 p-4 bg-white rounded-lg min-h-[50px] text-slate-700 leading-relaxed whitespace-pre-wrap"></div>
+                </div>
+            </div>
+            
+            <!-- TAB 3: BÀI TẬP VẬN DỤNG -->
+            <div id="tab-content-3" class="tab-content bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                <h2 class="text-3xl font-bold text-teal-600 mb-6">Chủ đề 3: Trở thành "nhà pha chế" tài ba</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <p class="mb-4 text-lg leading-relaxed">Kiến thức không chỉ để học thuộc, mà là để vận dụng! Bây giờ, chúng ta sẽ thử áp dụng những gì đã học về mol và nồng độ để thực hành pha chế dung dịch. Đây là một kỹ năng cực kỳ quan trọng trong phòng thí nghiệm đấy các em.</p>
+                        <p class="mb-4 text-lg leading-relaxed">Hãy thử tưởng tượng em cần pha một dung dịch muối ăn (NaCl) có nồng độ chính xác. Em sẽ cần cân bao nhiêu gam muối? Cần đong bao nhiêu ml nước? Tất cả đều có thể tính toán được dựa vào các công thức đã học.</p>
+                    </div>
+                    <div class="flex flex-col items-center justify-center bg-gray-50 rounded-lg p-4"><h4 class="font-bold mb-2">Mô phỏng: Tính toán pha chế</h4><svg id="mixing-svg" class="w-full h-64 rounded-lg" viewBox="0 0 400 200"></svg><div class="w-full mt-4"><label for="solute-mass-slider" class="block text-sm font-medium text-slate-700">Khối lượng chất tan (g): <span id="solute-mass-value">10</span>g</label><input type="range" id="solute-mass-slider" min="1" max="50" value="10" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"></div></div>
+                </div>
+                 <div class="goc-tuong-tac mt-10 p-6 rounded-xl"><h3 class="font-bold text-xl text-teal-700 mb-4">Góc tương tác của Thầy Lâm</h3><div class="flex flex-col sm:flex-row gap-2"><input type="text" id="ai-input-3" class="flex-grow p-3 border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition" placeholder="Hỏi thầy về cách pha chế dung dịch..."><button onclick="askAI(3)" class="bg-yellow-400 text-white font-bold py-3 px-6 rounded-lg hover:bg-yellow-500 transition-transform transform hover:scale-105 shadow-md">Gửi</button></div><div id="ai-response-3" class="mt-4 p-4 bg-white rounded-lg min-h-[50px] text-slate-700 leading-relaxed whitespace-pre-wrap"></div></div>
+            </div>
+
+            <!-- TAB 4: HÓA HỌC QUANH TA -->
+            <div id="tab-content-4" class="tab-content bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                <h2 class="text-3xl font-bold text-teal-600 mb-6">Chủ đề 4: Hóa học quanh ta</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <p class="mb-4 text-lg leading-relaxed">Nhiều em nghĩ Hóa học thật xa vời, nhưng sự thật là nó ở ngay xung quanh chúng ta! Những khái niệm ta vừa học có vô vàn ứng dụng thực tế.</p>
+                        <ul class="list-none space-y-4 text-lg"><li class="flex items-start"><span class="text-yellow-500 mr-3 text-2xl">💧</span><div><strong class="text-teal-600">Nước muối sinh lý:</strong> Đó là dung dịch NaCl 0.9%. Các bác sĩ đã dùng nồng độ phần trăm để pha chế nó đấy!</div></li><li class="flex items-start"><span class="text-yellow-500 mr-3 text-2xl">💨</span><div><strong class="text-teal-600">Bình gas:</strong> Người ta dùng khái niệm mol và tỉ khối để tính toán và nén một lượng khí khổng lồ vào chiếc bình nhỏ gọn.</div></li><li class="flex items-start"><span class="text-yellow-500 mr-3 text-2xl">🚗</span><div><strong class="text-teal-600">Túi khí ô tô:</strong> Một phản ứng hóa học cực nhanh tạo ra một lượng khí (tính bằng mol) đủ lớn để làm phồng túi khí, bảo vệ chúng ta.</div></li></ul>
+                    </div>
+                    <div class="flex flex-col items-center justify-center bg-gray-50 rounded-lg p-4"><h4 class="font-bold mb-2">Mô phỏng: Túi khí ô tô</h4><svg id="airbag-svg" class="w-full h-64 rounded-lg" viewBox="0 0 400 200"></svg><button id="crash-btn" class="mt-4 bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 transition">Gây va chạm</button></div>
+                </div>
+                <div class="goc-tuong-tac mt-10 p-6 rounded-xl"><h3 class="font-bold text-xl text-teal-700 mb-4">Góc tương tác của Thầy Lâm</h3><div class="flex flex-col sm:flex-row gap-2"><input type="text" id="ai-input-4" class="flex-grow p-3 border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition" placeholder="Hỏi thầy về ứng dụng hóa học..."><button onclick="askAI(4)" class="bg-yellow-400 text-white font-bold py-3 px-6 rounded-lg hover:bg-yellow-500 transition-transform transform hover:scale-105 shadow-md">Gửi</button></div><div id="ai-response-4" class="mt-4 p-4 bg-white rounded-lg min-h-[50px] text-slate-700 leading-relaxed whitespace-pre-wrap"></div></div>
+            </div>
+
+            <!-- TAB 5: KIỂM TRA KIẾN THỨC -->
+            <div id="tab-content-5" class="tab-content bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                <div id="quiz-container" class="max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-center text-teal-600 mb-2">Thử tài Hóa học</h2>
+                    <p class="text-center text-slate-500 mb-8">Đã đến lúc xem các "nhà hóa học nhí" của thầy tiếp thu bài đến đâu rồi!</p>
+                    <div id="quiz-question-area"><div class="bg-teal-50 p-4 rounded-lg mb-6"><p class="text-sm text-teal-700 font-semibold">Câu hỏi <span id="question-number">1</span> / <span id="total-questions">10</span></p><h3 id="question-text" class="text-xl font-bold text-slate-800 mt-1"></h3></div><div id="answer-options" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div><div class="mt-8 text-right"><button id="next-question-btn" class="bg-yellow-400 text-white font-bold py-3 px-8 rounded-lg hover:bg-yellow-500 transition-transform transform hover:scale-105 shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:scale-100" disabled>Câu tiếp</button></div></div>
+                    <div id="quiz-results-area" class="hidden text-center"><h3 class="text-2xl font-bold text-teal-600 mb-4">Hoàn thành!</h3><div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg mb-6 inline-block"><p class="text-lg">Số câu đúng:</p><p class="text-5xl font-extrabold my-2"><span id="score"></span>/<span id="total-score"></span></p><p class="text-2xl font-bold">(Đạt <span id="percentage"></span>%)</p></div><p id="result-comment" class="text-lg text-slate-700 mt-4 italic"></p><button id="restart-quiz-btn" class="mt-8 bg-teal-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-teal-600 transition">Làm lại</button></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- KHAI BÁO BIẾN VÀ HẰNG SỐ ---
+        const API_KEY = "[Dán API Key của bạn vào đây]"; 
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+        
+        // --- LOGIC CHUYỂN TAB ---
+        const tabButtons = document.getElementById('tab-buttons');
+        const tabContents = document.getElementById('tab-contents');
+
+        tabButtons.addEventListener('click', (e) => {
+            const targetButton = e.target.closest('button');
+            if (!targetButton) return;
+            const tabNumber = targetButton.dataset.tab;
+            if (!tabNumber) return;
+            tabButtons.querySelector('.active').classList.remove('active');
+            tabContents.querySelector('.active').classList.remove('active');
+            targetButton.classList.add('active');
+            document.getElementById(`tab-content-${tabNumber}`).classList.add('active');
+        });
+
+        // --- LOGIC MÔ PHỎNG SVG ---
+        function animateMolSVG() {
+            const svg = document.getElementById('mol-svg');
+            if (!svg) return; svg.innerHTML = '';
+            const box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            box.setAttribute('x', 250); box.setAttribute('y', 50); box.setAttribute('width', 130); box.setAttribute('height', 130); box.setAttribute('fill', 'rgba(13, 148, 136, 0.1)'); box.setAttribute('stroke', 'var(--mau-xanh-dam)'); box.setAttribute('stroke-width', 2); svg.appendChild(box);
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', 315); text.setAttribute('y', 125); text.setAttribute('fill', 'var(--mau-xanh-dam)'); text.setAttribute('font-size', '24'); text.setAttribute('font-weight', 'bold'); text.setAttribute('text-anchor', 'middle'); text.textContent = '1 Mol'; svg.appendChild(text);
+            for (let i = 0; i < 15; i++) {
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', Math.random() * 150); circle.setAttribute('cy', Math.random() * 200); circle.setAttribute('r', 5); circle.setAttribute('fill', 'var(--mau-vang)'); svg.appendChild(circle);
+                const animate = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion');
+                animate.setAttribute('path', `M ${circle.getAttribute('cx')},${circle.getAttribute('cy')} L ${260 + Math.random() * 110},${60 + Math.random() * 110}`); animate.setAttribute('dur', `${2 + Math.random() * 3}s`); animate.setAttribute('begin', `${Math.random()}s`); animate.setAttribute('repeatCount', 'indefinite'); circle.appendChild(animate);
+            }
+        }
+        function animateConcentrationSVG() {
+            const svg = document.getElementById('concentration-svg');
+            const addBtn = document.getElementById('add-solute-btn');
+            if (!svg || !addBtn) return;
+            let soluteCount = 5;
+            function draw() {
+                svg.innerHTML = '';
+                const beaker = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                beaker.setAttribute('d', 'M50 50 L 50 220 L 350 220 L 350 50'); beaker.setAttribute('stroke', '#9ca3af'); beaker.setAttribute('stroke-width', '4'); beaker.setAttribute('fill', 'none'); svg.appendChild(beaker);
+                const solvent = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                solvent.setAttribute('x', '52'); solvent.setAttribute('y', '100'); solvent.setAttribute('width', '296'); solvent.setAttribute('height', '118'); solvent.setAttribute('fill', 'rgba(59, 130, 246, 0.3)'); svg.appendChild(solvent);
+                for (let i = 0; i < soluteCount; i++) {
+                    const particle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    particle.setAttribute('cx', 70 + Math.random() * 260); particle.setAttribute('cy', 120 + Math.random() * 90); particle.setAttribute('r', 6); particle.setAttribute('fill', 'var(--mau-vang-dam)');
+                    const animate = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+                    animate.setAttribute('attributeName', 'cy'); animate.setAttribute('values', `${particle.getAttribute('cy') - 10};${particle.getAttribute('cy') + 10};${particle.getAttribute('cy') - 10}`); animate.setAttribute('dur', `${2 + Math.random() * 2}s`); animate.setAttribute('repeatCount', 'indefinite'); particle.appendChild(animate); svg.appendChild(particle);
+                }
+                const concentrationText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                concentrationText.setAttribute('x', 200); concentrationText.setAttribute('y', 40); concentrationText.setAttribute('text-anchor', 'middle'); concentrationText.setAttribute('font-size', '20'); concentrationText.setAttribute('font-weight', 'bold'); concentrationText.setAttribute('fill', 'var(--mau-chu-chinh)'); concentrationText.textContent = `Độ đậm đặc: ${soluteCount}`; svg.appendChild(concentrationText);
+            }
+            addBtn.onclick = () => { soluteCount += 5; if (soluteCount > 50) soluteCount = 5; draw(); };
+            draw();
+        }
+        function animateMixingSVG() {
+            const svg = document.getElementById('mixing-svg');
+            const slider = document.getElementById('solute-mass-slider');
+            const valueSpan = document.getElementById('solute-mass-value');
+            if(!svg || !slider || !valueSpan) return;
+            function draw(mass) {
+                svg.innerHTML = '';
+                const base = document.createElementNS('http://www.w3.org/2000/svg', 'rect'); base.setAttribute('x', 150); base.setAttribute('y', 150); base.setAttribute('width', 100); base.setAttribute('height', 20); base.setAttribute('fill', '#cbd5e1'); svg.appendChild(base);
+                const screen = document.createElementNS('http://www.w3.org/2000/svg', 'rect'); screen.setAttribute('x', 160); screen.setAttribute('y', 120); screen.setAttribute('width', 80); screen.setAttribute('height', 30); screen.setAttribute('fill', '#334155'); svg.appendChild(screen);
+                const massText = document.createElementNS('http://www.w3.org/2000/svg', 'text'); massText.setAttribute('x', 200); massText.setAttribute('y', 142); massText.setAttribute('text-anchor', 'middle'); massText.setAttribute('fill', '#fde047'); massText.setAttribute('font-size', 18); massText.textContent = `${mass}.0 g`; svg.appendChild(massText);
+                const pile = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); pile.setAttribute('cx', 200); pile.setAttribute('cy', 110); pile.setAttribute('r', mass*0.8); pile.setAttribute('fill', '#f59e0b'); svg.appendChild(pile);
+            }
+            slider.addEventListener('input', (e) => { const mass = e.target.value; valueSpan.textContent = mass; draw(mass); });
+            draw(slider.value);
+        }
+        function animateAirbagSVG() {
+            const svg = document.getElementById('airbag-svg');
+            const crashBtn = document.getElementById('crash-btn');
+            if(!svg || !crashBtn) return;
+            let crashed = false;
+            function draw(isDeployed) {
+                svg.innerHTML = '';
+                const wheel = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); wheel.setAttribute('cx', 200); wheel.setAttribute('cy', 100); wheel.setAttribute('r', 80); wheel.setAttribute('stroke', '#475569'); wheel.setAttribute('stroke-width', 15); wheel.setAttribute('fill', 'none'); svg.appendChild(wheel);
+                const center = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); center.setAttribute('cx', 200); center.setAttribute('cy', 100); center.setAttribute('r', 30); center.setAttribute('fill', '#64748b'); svg.appendChild(center);
+                if (isDeployed) {
+                    const airbag = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); airbag.setAttribute('cx', 200); airbag.setAttribute('cy', 100); airbag.setAttribute('r', 10); airbag.setAttribute('fill', '#e2e8f0'); svg.appendChild(airbag);
+                    const animate = document.createElementNS('http://www.w3.org/2000/svg', 'animate'); animate.setAttribute('attributeName', 'r'); animate.setAttribute('from', '10'); animate.setAttribute('to', '90'); animate.setAttribute('dur', '0.2s'); animate.setAttribute('fill', 'freeze'); airbag.appendChild(animate);
+                }
+            }
+            crashBtn.onclick = () => { crashed = !crashed; draw(crashed); if (crashed) { setTimeout(() => { crashed = false; draw(crashed); }, 2000); } };
+            draw(false);
+        }
+
+        // --- LOGIC BÀI KIỂM TRA (QUIZ) ---
+        const quizData = [
+            // Câu hỏi về Mol
+            { question: "1 mol của bất kỳ chất nào chứa bao nhiêu hạt (nguyên tử/phân tử)?", options: ["6,022 x 10²²", "6,022 x 10²³", "100", "Không xác định"], answer: 1 },
+            { question: "Khối lượng mol của Oxygen (O) là bao nhiêu?", options: ["8 g/mol", "32 g/mol", "16 amu", "16 g/mol"], answer: 3 },
+            { question: "Ở điều kiện chuẩn, 1 mol khí bất kỳ chiếm thể tích là:", options: ["22,4 lít", "24,79 lít", "1 lít", "Phụ thuộc vào khí"], answer: 1 },
+            { question: "Công thức tính tỉ khối của khí A so với không khí là:", options: ["d = Mₐ / Mₖₖ", "d = Mₐ / 22,4", "d = Mₐ / 29", "d = 29 / Mₐ"], answer: 2 },
+            // Câu hỏi về Dung dịch
+            { question: "Trong dung dịch nước đường, nước được gọi là gì?", options: ["Chất tan", "Dung dịch", "Dung môi", "Hỗn hợp"], answer: 2 },
+            { question: "Dung dịch không thể hòa tan thêm chất tan được gọi là dung dịch...", options: ["Loãng", "Đặc", "Bão hoà", "Chưa bão hoà"], answer: 2 },
+            { question: "Độ tan (S) được định nghĩa là số gam chất tan trong...", options: ["100g dung dịch", "1 lít dung dịch", "100g dung môi (nước)", "1 mol dung môi"], answer: 2 },
+            { question: "Công thức tính nồng độ phần trăm (C%) là:", options: ["C%=(mct/mdd)x100%", "C%=(mdd/mct)x100%", "C%=(mct/Vdd)x100%", "C%=(n/mdd)x100%"], answer: 0 },
+            { question: "Đơn vị của Nồng độ mol (CM) là gì?", options: ["g/mol", "%", "mol/lít", "gam"], answer: 2 },
+            { question: "Để pha loãng một dung dịch, ta cần làm gì?", options: ["Thêm chất tan", "Thêm dung môi", "Đun nóng", "Làm lạnh"], answer: 1 },
+        ];
+        let currentQuestionIndex = 0, score = 0, answerSelected = false;
+        const questionArea = document.getElementById('quiz-question-area'), resultsArea = document.getElementById('quiz-results-area'), questionNumberEl = document.getElementById('question-number'), totalQuestionsEl = document.getElementById('total-questions'), questionTextEl = document.getElementById('question-text'), answerOptionsEl = document.getElementById('answer-options'), nextQuestionBtn = document.getElementById('next-question-btn'), restartQuizBtn = document.getElementById('restart-quiz-btn');
+        function startQuiz() { currentQuestionIndex = 0; score = 0; questionArea.style.display = 'block'; resultsArea.style.display = 'none'; resultsArea.classList.add('hidden'); showQuestion(); }
+        function showQuestion() {
+            answerSelected = false; nextQuestionBtn.disabled = true;
+            const currentQuestion = quizData[currentQuestionIndex];
+            questionNumberEl.textContent = currentQuestionIndex + 1; totalQuestionsEl.textContent = quizData.length; questionTextEl.textContent = currentQuestion.question;
+            answerOptionsEl.innerHTML = '';
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'quiz-option p-4 w-full text-left rounded-lg text-lg'; button.textContent = option; button.dataset.index = index;
+                button.addEventListener('click', selectAnswer); answerOptionsEl.appendChild(button);
+            });
+        }
+        function selectAnswer(e) {
+            if (answerSelected) return; answerSelected = true;
+            const selectedButton = e.target;
+            const correctIndex = quizData[currentQuestionIndex].answer;
+            if (parseInt(selectedButton.dataset.index) === correctIndex) { score++; selectedButton.classList.add('correct'); } else { selectedButton.classList.add('incorrect'); }
+            answerOptionsEl.childNodes[correctIndex].classList.add('correct');
+            Array.from(answerOptionsEl.childNodes).forEach(b => { b.disabled = true; });
+            nextQuestionBtn.disabled = false;
+        }
+        nextQuestionBtn.addEventListener('click', () => { currentQuestionIndex++; if (currentQuestionIndex < quizData.length) { showQuestion(); } else { showResults(); } });
+        restartQuizBtn.addEventListener('click', startQuiz);
+        function showResults() {
+            questionArea.style.display = 'none'; resultsArea.style.display = 'block'; resultsArea.classList.remove('hidden');
+            document.getElementById('score').textContent = score; document.getElementById('total-score').textContent = quizData.length;
+            const percentage = Math.round((score / quizData.length) * 100);
+            document.getElementById('percentage').textContent = percentage;
+            let comment = "";
+            if (percentage === 100) comment = "Xuất sắc! Em đúng là một nhà hóa học thiên tài!";
+            else if (percentage >= 80) comment = "Rất tốt! Em đã nắm vững kiến thức rồi đấy.";
+            else if (percentage >= 50) comment = "Khá lắm! Em đã hiểu bài, chỉ cần xem lại vài chỗ nhỏ thôi.";
+            else comment = "Đừng buồn nhé! Cùng thầy xem lại bài giảng và thử lại nào!";
+            document.getElementById('result-comment').textContent = comment;
+        }
+
+        // --- LOGIC TƯƠNG TÁC VỚI GEMINI AI ---
+        async function askAI(tabId) {
+            const input = document.getElementById(`ai-input-${tabId}`);
+            const responseArea = document.getElementById(`ai-response-${tabId}`);
+            const userQuestion = input.value.trim();
+            if (!userQuestion) { responseArea.textContent = "Thầy chưa thấy câu hỏi của em."; return; }
+            if (API_KEY === "[Dán API Key của bạn vào đây]") { responseArea.textContent = "Lỗi: API Key chưa được cấu hình."; return; }
+            responseArea.textContent = "Thầy Lâm đang suy nghĩ..."; input.disabled = true;
+            let subject = "";
+            switch (tabId) {
+                case 1: subject = "mol, khối lượng mol, thể tích mol, và tỉ khối chất khí"; break;
+                case 2: subject = "dung dịch, độ tan, và các loại nồng độ"; break;
+                case 3: subject = "các bài toán pha chế dung dịch, tính toán theo phương trình hóa học"; break;
+                case 4: subject = "các ứng dụng thực tế của hóa học trong đời sống"; break;
+            }
+            const personaPrompt = `Bạn là Thầy Lâm, một chuyên gia về Khoa học tự nhiên với phong cách giảng bài gần gũi, sâu sắc. Bạn CHỈ được trả lời các câu hỏi liên quan chặt chẽ đến chủ đề của bài giảng là "${subject}". Nếu người dùng hỏi về các chủ đề không liên quan (ví dụ: lịch sử, phim ảnh...), bạn BẮT BUỘC phải từ chối một cách khéo léo và hài hước. Dựa vào đó, hãy trả lời câu hỏi sau của học sinh: "${userQuestion}"`;
+            try {
+                const response = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: personaPrompt }] }] }) });
+                if (!response.ok) throw new Error(`API request failed`);
+                const data = await response.json();
+                if (data.candidates && data.candidates.length > 0) {
+                    responseArea.textContent = data.candidates[0].content.parts[0].text + "\n\n--- Được giải đáp bởi Thầy Lâm.";
+                } else { throw new Error("No valid response from AI."); }
+            } catch (error) {
+                responseArea.textContent = "Ôi, có vẻ 'tín hiệu' hóa học của thầy trò mình đang gặp trục trặc. Em thử lại sau nhé!";
+            } finally { input.value = ''; input.disabled = false; }
+        }
+
+        // --- KHỞI CHẠY KHI TẢI TRANG ---
+        document.addEventListener('DOMContentLoaded', () => {
+            animateMolSVG();
+            animateConcentrationSVG();
+            animateMixingSVG();
+            animateAirbagSVG();
+            startQuiz();
+        });
+    </script>
+</body>
+</html>
